@@ -6,5 +6,8 @@ venv_activate: venv_create
 	venv/bin/activate
 	pip install -r requirements.txt
 
-run: venv_activate
+migrate: venv_activate
+	python manage.py migrate
+
+run: migrate
 	python manage.py runserver
