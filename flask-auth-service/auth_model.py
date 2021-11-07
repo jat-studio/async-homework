@@ -170,3 +170,64 @@ def check_blacklist(token: str) -> bool:
         if conn is not None:
             cur.close()
             conn.close()
+
+
+def get_clients() -> list:
+    conn = None
+    clients = []
+    query = "select * from clients"
+    try:
+        conn = psycopg2.connect(
+            "dbname=" + DBNAME + " user=" + DBUSER + " password=" + DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        rows = cur.fetchall()
+
+        for row in rows:
+            clients.append(
+                AuthPayload(
+                    id=row[0],
+                    uuid=row[1],
+                    email=row[3],
+                    full_name=row[4],
+                    position=row[5],
+                    is_active=row[6],
+                    role=row[7],
+                ).__dict__
+            )
+
+        return clients
+    except (Exception, psycopg2.DatabaseError) as error:
+
+        print(error)
+        if conn is not None:
+            cur.close()
+            conn.close()
+
+        return False
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()
+
+
+def delete(uuid: str) -> None:
+    conn = None
+    query = "delete from clients where Uuid=\'" + uuid + "\'"
+    try:
+        conn = psycopg2.connect(
+            "dbname=" + DBNAME + " user=" + DBUSER + " password=" + DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+    except (Exception, psycopg2.DatabaseError) as error:
+
+        print(error)
+        if conn is not None:
+            cur.close()
+            conn.close()
+
+        return False
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()

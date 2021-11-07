@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, render_template, request
 import json
 import hashlib
 
@@ -6,6 +6,18 @@ import auth_model
 
 # instantiate the Flask app.
 app = Flask(__name__)
+
+
+@app.route('/')
+def list_clients():
+    clients = auth_model.get_clients()
+    return render_template('clients.html', clients=clients)
+
+
+@app.route('/delete')
+def delete_client():
+    auth_model.delete(request.args.get("uuid"))
+    return {'success': True}
 
 
 # API Route for checking the client_id and client_secret
@@ -42,7 +54,7 @@ def logout():
     return {'success': status}
 
 
-@app.route("/client", methods=["POST", "DELETE"])
+@app.route("/client", methods=["POST"])
 def client() -> dict:
     if request.method == 'POST':
         uuid = request.form.get("uuid")
@@ -68,8 +80,6 @@ def client() -> dict:
             role=role,
         )
         return {'success': create_response}
-    elif request.method == 'DELETE':
-        return {'success': False}
     else:
         return {'success': False}
 
