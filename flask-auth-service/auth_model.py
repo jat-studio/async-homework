@@ -1,80 +1,58 @@
-import os
-import json
-
-# pip install psycopg2
-import psycopg2
-
-#pip install -U python-dotenv
-from dotenv import load_dotenv
-load_dotenv()
-
-# pip install pyjwt
 import jwt
+import sqlite3
+
+from flask import g
 
 from auth_payload import AuthPayload
 from auth_response import AuthResponse
 
-# Get environment variables
-DBNAME = os.getenv('DBNAME')
-DBUSER = os.getenv('DBUSER')
-DBPASSWORD = os.getenv("DBPASSWORD")
-AUTHSECRET = os.getenv("AUTHSECRET")
-EXPIRESSECONDS = os.getenv('EXPIRESSECONDS')
+AUTHSECRET = 'Xu6thooquai8ceih2aiveel2peev3zeec2nai2ooxohr6eic8zeeph4aeXingie9'
+DATABASE = './users.db'
+EXPIRESSECONDS = 10
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+
+    return db
 
 
 def authenticate(email: str, client_secret: str) -> bool:
-    conn = None
-    query = "select * from clients where \"Email\"='" + email + "' and \"ClientSecret\"='" + client_secret + "'"
-    try:
-        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(query)
-        rows = cur.fetchall()
+    query = "select * from users where \"Email\"='" + email + "' and \"ClientSecret\"='" + client_secret + "'"
 
-        if cur.rowcount == 1:
-            for row in rows:
-                payload = AuthPayload(
-                    id=row[0],
-                    uuid=row[1],
-                    email=row[3],
-                    full_name=row[4],
-                    position=row[5],
-                    is_active=row[6],
-                    role=row[7],
-                )
-                break
+    cur = get_db().cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
 
-            encoded_jwt = jwt.encode(payload.__dict__, AUTHSECRET, algorithm='HS256')
-            response = AuthResponse(token=encoded_jwt, expiresin=int(EXPIRESSECONDS))
-            
-            return response.__dict__
-        else:
-            return False
-        
-    except (Exception, psycopg2.DatabaseError) as error:
-        
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
+    if cur.rowcount == 1:
+        for row in rows:
+            payload = AuthPayload(
+                id=row[0],
+                uuid=row[1],
+                email=row[3],
+                full_name=row[4],
+                position=row[5],
+                is_active=row[6],
+                role=row[7],
+            )
+            break
 
+        encoded_jwt = jwt.encode(payload.__dict__, AUTHSECRET, algorithm='HS256')
+        response = AuthResponse(token=encoded_jwt, expiresin=int(EXPIRESSECONDS))
+
+        return response.__dict__
+    else:
         return False
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
 
 
 def verify(token):
     try:
-        is_blacklisted = check_blacklist(token)
-        if is_blacklisted:
-            return {"success": False}
-        else:
-            decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
-            return decoded
-    except (Exception) as error:
-        print(error)
+        decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
+        return decoded
+    except Exception as error:
         return {"success": False}
 
 
@@ -87,147 +65,82 @@ def create(
     is_active: bool,
     role: str,
 ) -> bool:
-    conn = None
     query = (
-        "insert into clients "
+        "insert into users "
         "(\"ClientSecret\", \"Uuid\", \"Email\", \"FullName\", \"Position\", \"IsActive\", \"Role\") "
-        "values(%s, %s, %s, %s, %s, %s, %s)"
+        f"values('{hashed_client_secret}', '{uuid}', '{email}', '{full_name}', '{position}', '{is_active}', '{role}')"
     )
 
-    try:
-        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(
-            query,
-            (
-                hashed_client_secret,
-                uuid,
-                email,
-                full_name,
-                position,
-                is_active,
-                role,
-            ),
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
+
+    return True
+
+
+def update_user(
+    email: str,
+    full_name: str,
+    position: str,
+    is_active: bool,
+    role: str,
+) -> bool:
+    query = (
+        "update users set"
+        f"\"Email\"='{email}', \"FullName\"='{full_name}', \"Position\"='{position}', \"IsActive\"='{is_active}', \"Role\"='{role}'"
+    )
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
+
+    return True
+
+
+def get_users() -> list:
+    users = []
+    query = "select * from users"
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    rows = cur.fetchall()
+
+    for row in rows:
+        users.append(
+            AuthPayload(
+                id=row[0],
+                uuid=row[2],
+                email=row[3],
+                full_name=row[4],
+                position=row[5],
+                is_active=row[6],
+                role=row[7],
+            ).__dict__
         )
-        conn.commit()
-        return True
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
 
-        return False
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-
-def blacklist(token: str) -> bool:
-    conn = None
-    query = "insert into blacklist (\"token\") values(\'" + token +"\')"
-    try:
-        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(query)
-        conn.commit()
-        return True
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-        return False
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-
-def check_blacklist(token: str) -> bool:
-    conn = None
-    query = "select count(*) from blacklist where token=\'" + token + "\'"
-    print(query)
-    try:
-        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(query)
-        result = cur.fetchone()
-        if result[0] == 1:
-            return True
-        else:
-            return False
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-        return True
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-
-def get_clients() -> list:
-    conn = None
-    clients = []
-    query = "select * from clients"
-    try:
-        conn = psycopg2.connect(
-            "dbname=" + DBNAME + " user=" + DBUSER + " password=" + DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(query)
-        rows = cur.fetchall()
-
-        for row in rows:
-            clients.append(
-                AuthPayload(
-                    id=row[0],
-                    uuid=row[1],
-                    email=row[3],
-                    full_name=row[4],
-                    position=row[5],
-                    is_active=row[6],
-                    role=row[7],
-                ).__dict__
-            )
-
-        return clients
-    except (Exception, psycopg2.DatabaseError) as error:
-
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
-
-        return False
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
+    return users
 
 
 def delete(uuid: str) -> None:
-    conn = None
-    query = "delete from clients where Uuid=\'" + uuid + "\'"
-    try:
-        conn = psycopg2.connect(
-            "dbname=" + DBNAME + " user=" + DBUSER + " password=" + DBPASSWORD)
-        cur = conn.cursor()
-        cur.execute(query)
-    except (Exception, psycopg2.DatabaseError) as error:
+    query = "delete from users where Uuid=\'" + uuid + "\'"
 
-        print(error)
-        if conn is not None:
-            cur.close()
-            conn.close()
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
 
-        return False
-    finally:
-        if conn is not None:
-            cur.close()
-            conn.close()
+
+def get_user(uuid: str) -> dict:
+    query = "select * from users where Uuid=\'" + uuid + "\'"
+
+    cur = get_db().cursor()
+    row = cur.execute(query).fetchone()
+
+    return AuthPayload(
+        id=row[0],
+        uuid=row[2],
+        email=row[3],
+        full_name=row[4],
+        position=row[5],
+        is_active=row[6],
+        role=row[7],
+    ).__dict__

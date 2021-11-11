@@ -1,0 +1,18 @@
+<!doctype html>
+<title>Список клиентов</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Список пользователей</h1>
+</nav>
+<section class="content">
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+  <div class="flash"><a href="/signup">Создать нового</a></br></br></div>
+  {% for user in users %}
+    <div class="flash">{{ user }}</div>
+    <div class="flash"><a href="/edit?uuid={{ user.uuid }}">Изменить</a></div>
+    <div class="flash"><a href="/delete?uuid={{ user.uuid }}">Удалить</a></div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</section>

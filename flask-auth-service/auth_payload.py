@@ -1,8 +1,3 @@
-from datetime import datetime  
-from datetime import timedelta  
-import os
-
-
 class AuthPayload(dict):
 
     def __init__(
@@ -22,8 +17,3 @@ class AuthPayload(dict):
         self.position = position
         self.is_active = is_active
         self.role = role
-
-        # set the expiry attrbute to 30 minutes
-        self.exp = (
-            datetime.utcnow() + timedelta(seconds=int(os.getenv('EXPIRESSECONDS')))
-        )

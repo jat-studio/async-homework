@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+import uuid
+from flask import Flask, g, render_template, request
 import json
 import hashlib
 
@@ -8,14 +9,37 @@ import auth_model
 app = Flask(__name__)
 
 
+@app.route('/signup')
+def signup():
+    return render_template('signup.html')
+
+
+@app.route('/create', methods=['POST'])
+def add_user():
+    hash_object = hashlib.sha1(bytes(request.form.get('password'), 'utf-8'))
+    hashed_client_secret = hash_object.hexdigest()
+
+    create_response = auth_model.create(
+        hashed_client_secret=hashed_client_secret,
+        uuid=str(uuid.uuid4()),
+        email=request.form.get('email'),
+        full_name=request.form.get('full_name'),
+        position="position",
+        is_active=True,
+        role="employee",
+    )
+
+    return {'success': create_response}
+
+
 @app.route('/')
-def list_clients():
-    clients = auth_model.get_clients()
-    return render_template('clients.html', clients=clients)
+def list_users():
+    users = auth_model.get_users()
+    return render_template('users.html', users=users)
 
 
 @app.route('/delete')
-def delete_client():
+def delete_user():
     auth_model.delete(request.args.get("uuid"))
     return {'success': True}
 
@@ -47,41 +71,29 @@ def verify():
     return verification
 
 
-@app.route("/logout", methods=["POST"])
-def logout():
-    token = request.form.get("token")
-    status = auth_model.blacklist(token)
-    return {'success': status}
+@app.route("/edit")
+def edit_user():
+    return render_template('edit.html', user=auth_model.get_user(uuid=request.args.get("uuid")))
 
 
-@app.route("/client", methods=["POST"])
-def client() -> dict:
-    if request.method == 'POST':
-        uuid = request.form.get("uuid")
-        email = request.form.get("email")
-        full_name = request.form.get("full_name")
-        position = request.form.get("position")
-        is_active = request.form.get("is_active")
-        role = request.form.get("role")
+@app.route("/update", methods=["POST"])
+def update_user():
+    update_response = auth_model.update_user(
+        email=request.form.get('email'),
+        full_name=request.form.get('full_name'),
+        position=request.form.get('position'),
+        is_active=True if request.form.get('is_active') == 'True' else False,
+        role=request.form.get('role'),
+    )
 
-        # the client secret in the database is "hashed" with a one-way hash
-        client_secret_input = request.form.get("client_secret")
-        hash_object = hashlib.sha1(bytes(client_secret_input, 'utf-8'))
-        hashed_client_secret = hash_object.hexdigest()
+    return {'success': update_response}
 
-        # make a call to the model to authenticate
-        create_response = auth_model.create(
-            hashed_client_secret=hashed_client_secret,
-            uuid=uuid,
-            email=email,
-            full_name=full_name,
-            position=position,
-            is_active=is_active,
-            role=role,
-        )
-        return {'success': create_response}
-    else:
-        return {'success': False}
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 # run the flask app.
