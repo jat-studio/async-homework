@@ -7,4 +7,7 @@ venv_activate: venv_create
 	pip install -r requirements.txt
 
 run: venv_activate
-	python manage.py runserver
+	python main.py
+
+run_consumer: venv_activate
+	python -m consumer.main

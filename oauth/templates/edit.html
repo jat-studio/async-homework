@@ -1,0 +1,19 @@
+<!doctype html>
+<title>Редактировать пользователя</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Редактировать пользователя</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+    <form method="POST" action="/update">
+      <input type="hidden" name="public_id" value={{ user.public_id }} />
+      <label>email: <input type="email" name="email" autocomplete="email" value={{ user.email }} required></label><br/>
+      <label>full_name: <input type="full_name" name="full_name" autocomplete="full_name" value={{ user.full_name }} required></label><br/>
+      <label>position: <input type="position" name="position" autocomplete="position" value={{ user.position }} required></label><br/>
+      <label>is_active: <input type="is_active" name="is_active" autocomplete="is_active" value={{ user.is_active }} required></label><br/>
+      <label>role: <input type="role" name="role" autocomplete="role" value={{ user.role }} required></label><br/>
+      <button type="submit">Confirm</button>
+    </form>
+</section>

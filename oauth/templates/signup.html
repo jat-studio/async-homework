@@ -1,0 +1,16 @@
+<!doctype html>
+<title>Новый пользователь</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Новый пользователь</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+    <form method="POST" action="/create">
+      <label>full_name: <input type="full_name" name="full_name" autocomplete="full_name" required></label><br/>
+      <label>email: <input type="email" name="email" autocomplete="email" required></label><br/>
+      <label>password: <input type="password" name="password" autocomplete="current-password" required></label><br/>
+      <button type="submit">Sign UP</button>
+    </form>
+</section>
