@@ -74,12 +74,29 @@ def get_items(user: dict, w_all: bool = False):
     return items
 
 
+def get_item(public_id: str):
+    query = f"select * from items where PublicId='{public_id}'"
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    row = cur.fetchone()
+
+    return Item(
+        id=row[0],
+        user_id=row[1],
+        public_id=row[2],
+        title=row[3],
+        description=row[4],
+        status=row[5],
+    ).__dict__
+
+
 def add_item(
     public_id: str,
     title: str,
     description: str,
     status: str,
-) -> None:
+) -> dict:
     query = (
         "insert into items "
         "(PublicId, Title, Description, Status) values "
@@ -89,6 +106,8 @@ def add_item(
     cur = get_db().cursor()
     cur.execute(query)
     get_db().commit()
+
+    return get_item(public_id)
 
 
 def add_user(
