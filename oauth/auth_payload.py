@@ -3,7 +3,7 @@ class AuthPayload(dict):
     def __init__(
         self,
         id: int,
-        uuid: str,
+        public_id: str,
         email: str,
         full_name: str,
         position: str,
@@ -11,7 +11,7 @@ class AuthPayload(dict):
         role: str,
     ) -> None:
         self.id = id
-        self.uuid = uuid
+        self.public_id = public_id
         self.email = email
         self.full_name = full_name
         self.position = position

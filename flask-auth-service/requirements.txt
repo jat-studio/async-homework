@@ -1,5 +1,0 @@
-flask
-psycopg2
-pyjwt
-python-dotenv
-

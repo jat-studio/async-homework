@@ -6,10 +6,9 @@
 </nav>
 <section class="content">
   <header>
-    {% block header %}{% endblock %}
   </header>
-    {% block content %}{% endblock %}
     <form method="POST" action="/update">
+      <input type="hidden" name="public_id" value={{ user.public_id }} />
       <label>email: <input type="email" name="email" autocomplete="email" value={{ user.email }} required></label><br/>
       <label>full_name: <input type="full_name" name="full_name" autocomplete="full_name" value={{ user.full_name }} required></label><br/>
       <label>position: <input type="position" name="position" autocomplete="position" value={{ user.position }} required></label><br/>

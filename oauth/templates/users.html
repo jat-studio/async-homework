@@ -6,13 +6,11 @@
 </nav>
 <section class="content">
   <header>
-    {% block header %}{% endblock %}
   </header>
   <div class="flash"><a href="/signup">Создать нового</a></br></br></div>
   {% for user in users %}
     <div class="flash">{{ user }}</div>
-    <div class="flash"><a href="/edit?uuid={{ user.uuid }}">Изменить</a></div>
-    <div class="flash"><a href="/delete?uuid={{ user.uuid }}">Удалить</a></div>
+    <div class="flash"><a href="/edit?public_id={{ user.public_id }}">Изменить</a></div>
+    <div class="flash"><a href="/delete?public_id={{ user.public_id }}">Удалить</a></div>
   {% endfor %}
-  {% block content %}{% endblock %}
 </section>

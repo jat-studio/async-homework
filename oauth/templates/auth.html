@@ -1,0 +1,15 @@
+<!doctype html>
+<title>Вход</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <h1>Вход</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+    <form method="POST" action="/auth">
+      <label>email: <input type="email" name="email" autocomplete="email" required></label><br/>
+      <label>password: <input type="client_secret" name="client_secret" autocomplete="client_secret" required></label><br/>
+      <button type="submit">Sign in</button>
+    </form>
+</section>
