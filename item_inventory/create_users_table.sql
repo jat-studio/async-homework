@@ -1,7 +1,7 @@
 CREATE TABLE users
 (
     "Id" integer NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "Uuid" character VARCHAR(128) NOT NULL,
+    "PublicId" character VARCHAR(128) NOT NULL,
     "Email" character VARCHAR(128) NOT NULL,
     "FullName" character VARCHAR(128) NOT NULL,
     "Role" character varying(128) NOT NULL

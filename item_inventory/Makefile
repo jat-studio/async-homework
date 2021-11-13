@@ -7,7 +7,7 @@ venv_activate: venv_create
 	pip install -r requirements.txt
 
 run: venv_activate
-	python task_tracker.py
+	python main.py
 
 run_consumer: venv_activate
-	python consumer.py
+	python -m consumer.main

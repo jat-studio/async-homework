@@ -1,5 +1,7 @@
 import uuid
-from flask import Flask, g, render_template, request
+
+import flask
+from flask import Flask, g, redirect, render_template, request
 import json
 import hashlib
 
@@ -9,6 +11,10 @@ from rabbitmq_gateway import RabbitMQGateway
 
 app = Flask(__name__)
 rmq = RabbitMQGateway()
+urls_map = {
+    None: "http://localhost:5000/",
+    "item_inventory": "http://localhost:5001/",
+}
 
 
 @app.route('/signup')
@@ -91,7 +97,11 @@ def auth():
 
         # make a call to the model to authenticate
         authentication = auth_model.authenticate(email, hashed_client_secret)
-        return {'success': False} if not authentication else json.dumps(authentication)
+
+        if not authentication:
+            return {'success': False}
+        else:
+            return redirect(urls_map[request.form.get("service")] + f"?token={authentication['token']}", code=302)
 
 
 # API route for verifying the token passed by API calls

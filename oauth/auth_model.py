@@ -8,7 +8,7 @@ from auth_response import AuthResponse
 
 AUTHSECRET = 'Xu6thooquai8ceih2aiveel2peev3zeec2nai2ooxohr6eic8zeeph4aeXingie9'
 DATABASE = './users.db'
-EXPIRESSECONDS = 10
+EXPIRESSECONDS = 60 * 60 * 10
 
 
 def get_db():
@@ -18,6 +18,14 @@ def get_db():
         db = g._database = sqlite3.connect(DATABASE)
 
     return db
+
+
+def verify(token):
+    try:
+        decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
+        return decoded
+    except Exception:
+        return {"success": False}
 
 
 def authenticate(email: str, client_secret: str) -> bool:
@@ -30,7 +38,7 @@ def authenticate(email: str, client_secret: str) -> bool:
     if row:
         payload = AuthPayload(
             id=row[0],
-            public_id=row[1],
+            public_id=row[2],
             email=row[3],
             full_name=row[4],
             position=row[5],
@@ -42,14 +50,6 @@ def authenticate(email: str, client_secret: str) -> bool:
         return AuthResponse(token=encoded_jwt, expiresin=int(EXPIRESSECONDS)).__dict__
     else:
         return False
-
-
-def verify(token):
-    try:
-        decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
-        return decoded
-    except Exception:
-        return {"success": False}
 
 
 def create(

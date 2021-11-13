@@ -1,15 +1,24 @@
 #!/usr/bin/env python
+import json
 import os
 import sys
 
+from consumer import callbacks
 from rabbitmq_gateway import (
     BUSINESS_EVENTS_EXCHANGE,
     CUD_EVENTS_EXCHANGE,
     RabbitMQGateway,
 )
 
-CUD_QUEUE = "cud-task-tracker"
-BUSINESS_QUEUE = "business-task-tracker"
+CUD_QUEUE = "cud-item-inventory"
+BUSINESS_QUEUE = "business-item-inventory"
+
+
+callbacks_map = {
+    "AccountCreated": callbacks.user_created,
+    "AccountRoleChanged": callbacks.user_role_changed,
+    "AccountUpdated": callbacks.user_updated,
+}
 
 
 def main() -> None:
@@ -24,6 +33,8 @@ def main() -> None:
 
     def callback(ch, method, properties, body):
         print(" [x] Received %r" % body)
+        raw = json.loads(body)
+        callbacks_map.get(raw["event_name"], callbacks.dummy)(raw["data"])
 
     channel.basic_consume(queue=CUD_QUEUE, on_message_callback=callback, auto_ack=True)
     channel.basic_consume(queue=BUSINESS_QUEUE, on_message_callback=callback, auto_ack=True)
@@ -40,4 +51,4 @@ if __name__ == '__main__':
         try:
             sys.exit(0)
         except SystemExit:
-            os.exit(0)
+            os.close(0)

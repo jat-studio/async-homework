@@ -4,7 +4,7 @@ import pika
 HOST = "localhost"
 USER = "admin"
 PASSWORD = "admin"
-PORT = 5672
+PORT = 25672
 VHOST = "%2F"
 
 BUSINESS_EVENTS_EXCHANGE = "business-events"

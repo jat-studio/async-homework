@@ -8,6 +8,7 @@
   <header>
   </header>
     <form method="POST" action="/auth">
+      <input type="hidden" name="service" value={{ request.args.service }} />
       <label>email: <input type="email" name="email" autocomplete="email" required></label><br/>
       <label>password: <input type="client_secret" name="client_secret" autocomplete="client_secret" required></label><br/>
       <button type="submit">Sign in</button>
