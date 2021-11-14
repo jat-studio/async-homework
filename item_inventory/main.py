@@ -16,7 +16,7 @@ def main():
     user = inventory_model.verify(request.args.get("token"))
 
     if user:
-        items = inventory_model.get_items(user=user, w_all=True)
+        items = inventory_model.get_items(user=user, w_all=True) if user["role"] == "administrator" else []
         myitems = inventory_model.get_items(user=user, w_all=False)
         return render_template("main.html", user=user, items=items, myitems=myitems)
     else:
@@ -55,6 +55,55 @@ def add_item():
             )
 
             return {"success": True}
+    else:
+        return redirect("http://localhost:5000/auth?service=item_inventory", code=302)
+
+
+@app.route("/book")
+def book_item():
+    user = inventory_model.verify(request.args.get("token"))
+
+    if user:
+        inventory_model.book_item(public_id=request.args.get("public_id"))
+        return {"success": True}
+    else:
+        return redirect("http://localhost:5000/auth?service=item_inventory", code=302)
+
+
+@app.route("/unbook")
+def unbook_item():
+    user = inventory_model.verify(request.args.get("token"))
+
+    if user:
+        inventory_model.unbook_item(public_id=request.args.get("public_id"))
+        return {"success": True}
+    else:
+        return redirect("http://localhost:5000/auth?service=item_inventory", code=302)
+
+
+@app.route("/broken")
+def broken_item():
+    user = inventory_model.verify(request.args.get("token"))
+
+    if user:
+        public_id = request.args.get("public_id")
+        inventory_model.broken_item(public_id=public_id)
+
+        rmq.produce_business_event(
+            json.dumps(
+                {
+                    "producer": "item_inventory",
+                    "event_version": 1,
+                    "event_name": "ItemBroken",
+                    "data": {
+                        "public_id": public_id,
+                        "requester_public_id": user["public_id"],
+                    }
+                }
+            )
+        )
+
+        return {"success": True}
     else:
         return redirect("http://localhost:5000/auth?service=item_inventory", code=302)
 

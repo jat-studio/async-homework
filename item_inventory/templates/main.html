@@ -17,10 +17,38 @@
 <section class="content">
   <header>
   </header>
-  {% for item in items %}
-    <div class="flash">{{ item }}</div>
-  {% endfor %}
-  <div class="flash"><a href="/add">Создать новый</a></br></br></div>
+  <table class="table table-hover">
+      <thead>
+      <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Public ID</th>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Status</th>
+          <th scope="col">Meta</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for item in items %}
+      <tr>
+          <td>{{item.id}}</td>
+          <td>{{item.public_id}}</td>
+          <td>{{item.title}}</td>
+          <td>{{item.description}}</td>
+          <td>{{item.status}}</td>
+          <td>{{item.meta}}</td>
+          {% if item.status == 'free' %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/book?public_id={{ item.public_id }}';">Book</button></td>
+          {% else %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/unbook?public_id={{ item.public_id }}';">Unbook</button></td>
+          {% endif %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/broken?public_id={{ item.public_id }}';">Сломан</button></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+
+  <div><button type="submit" class="btn btn-primary" onclick="window.location.href = '/add';">Создать новый</button></div>
 </section>
 {% endif %}
 
@@ -30,7 +58,34 @@
 <section class="content">
   <header>
   </header>
-  {% for myitem in myitems %}
-    <div class="flash">{{ myitem }}</div>
-  {% endfor %}
+  <table class="table table-hover">
+      <thead>
+      <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Public ID</th>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Status</th>
+          <th scope="col">Meta</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for myitem in myitems %}
+      <tr>
+          <td>{{myitem.id}}</td>
+          <td>{{myitem.public_id}}</td>
+          <td>{{myitem.title}}</td>
+          <td>{{myitem.description}}</td>
+          <td>{{myitem.status}}</td>
+          <td>{{myitem.meta}}</td>
+          {% if myitem.status == 'free' %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/book?public_id={{ myitem.public_id }}';">Book</button></td>
+          {% else %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/unbook?public_id={{ myitem.public_id }}';">Unbook</button></td>
+          {% endif %}
+          <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/broken?public_id={{ myitem.public_id }}';">Сломан</button></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
 </section>

@@ -1,3 +1,4 @@
+import json
 import jwt
 import sqlite3
 
@@ -23,10 +24,12 @@ def verify(token):
     if not token and session.get("token"):
         token = session.get("token")
 
+    print(token)
     user = None
     try:
         decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
         user = get_user(decoded["public_id"])
+        print(user)
     except Exception:
         return False
 
@@ -68,6 +71,7 @@ def get_items(user: dict, w_all: bool = False):
                 title=row[3],
                 description=row[4],
                 status=row[5],
+                meta=json.loads(row[6])
             ).__dict__
         )
 
@@ -88,6 +92,7 @@ def get_item(public_id: str):
         title=row[3],
         description=row[4],
         status=row[5],
+        meta=json.loads(row[6])
     ).__dict__
 
 
@@ -150,6 +155,30 @@ def update_user_role(
         "update users set "
         f"Role='{role}' where PublicId='{public_id}'"
     )
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
+
+
+def book_item(public_id: str) -> None:
+    query = f"update items set Status='locked' where PublicId='{public_id}'"
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
+
+
+def unbook_item(public_id: str) -> None:
+    query = f"update items set Status='free' where PublicId='{public_id}'"
+
+    cur = get_db().cursor()
+    cur.execute(query)
+    get_db().commit()
+
+
+def broken_item(public_id: str) -> None:
+    query = f"update items set Status='broken' where PublicId='{public_id}'"
 
     cur = get_db().cursor()
     cur.execute(query)

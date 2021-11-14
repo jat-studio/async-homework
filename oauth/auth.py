@@ -1,6 +1,5 @@
 import uuid
 
-import flask
 from flask import Flask, g, redirect, render_template, request
 import json
 import hashlib
@@ -14,6 +13,7 @@ rmq = RabbitMQGateway()
 urls_map = {
     None: "http://localhost:5000/",
     "item_inventory": "http://localhost:5001/",
+    "fix_cms": "http://localhost:5002/",
 }
 
 

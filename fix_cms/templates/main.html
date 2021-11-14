@@ -1,0 +1,22 @@
+<!doctype html>
+<title>Сервис fix CMS</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<nav>
+  <h1>Текущий пользователь</h1>
+</nav>
+<section class="content">
+  <header></header>
+  <div class="flash">{{ user }}</div>
+</section>
+
+<nav>
+  <h1>Список айтемов на починку</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+  {% for item in items %}
+    <div class="flash">{{ item }}</div>
+  {% endfor %}
+</section>

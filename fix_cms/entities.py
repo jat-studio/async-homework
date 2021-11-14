@@ -18,7 +18,6 @@ class Item:
     id: int
     public_id: str
     title: str
-    description: str
     status: str
-    user_id: Optional[int]
-    meta: dict
+    break_count: int
+    owner_public_id: Optional[str]
