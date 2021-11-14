@@ -7,10 +7,30 @@
 <section class="content">
   <header>
   </header>
-  <div class="flash"><a href="/signup">Создать нового</a></br></br></div>
-  {% for user in users %}
-    <div class="flash">{{ user }}</div>
-    <div class="flash"><a href="/edit?public_id={{ user.public_id }}">Изменить</a></div>
-    <div class="flash"><a href="/delete?public_id={{ user.public_id }}">Удалить</a></div>
-  {% endfor %}
+  <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Public ID</th>
+            <th scope="col">Email</th>
+            <th scope="col">FullName</th>
+            <th scope="col">Role</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.public_id}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.full_name}}</td>
+            <td>{{user.role}}</td>
+            <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/edit?public_id={{ user.public_id }}';">Изменить</button></td>
+            <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/delete?public_id={{ user.public_id }}';">Удалить</button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+  <div><button type="submit" class="btn btn-primary" onclick="window.location.href = '/signup';">Создать нового</button></div>
 </section>

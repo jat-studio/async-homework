@@ -1,0 +1,80 @@
+<!doctype html>
+<title>Таск трекер</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<nav>
+  <h1>Текущий пользователь</h1>
+</nav>
+<section class="content">
+  <header></header>
+  <div class="flash">{{ user }}</div>
+</section>
+
+{% if user.role in ('administrator', 'manager') %}
+<nav>
+  <h1>Список всех задач</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Public ID</th>
+        <th scope="col">Description</th>
+        <th scope="col">Status</th>
+        <th scope="col">Price</th>
+        <th scope="col">Assigned To</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for task in tasks %}
+    <tr>
+        <td>{{task.id}}</td>
+        <td>{{task.public_id}}</td>
+        <td>{{task.description}}</td>
+        <td>{{task.status}}</td>
+        <td>{{task.price}}</td>
+        <td>{{task.assign_to_public_id}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-primary" onclick="window.location.href = '/reassign';">Перераспределить задачи</button>
+</section>
+{% endif %}
+
+<nav>
+  <h1>Мои задачи</h1>
+</nav>
+<section class="content">
+  <header>
+  </header>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Public ID</th>
+        <th scope="col">Description</th>
+        <th scope="col">Status</th>
+        <th scope="col">Price</th>
+        <th scope="col">Assigned To</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for my_task in my_tasks %}
+    <tr>
+        <td>{{my_task.id}}</td>
+        <td>{{my_task.public_id}}</td>
+        <td>{{my_task.description}}</td>
+        <td>{{my_task.status}}</td>
+        <td>{{my_task.price}}</td>
+        <td>{{my_task.assign_to_public_id}}</td>
+        <td><button type="submit" class="btn btn-primary" onclick="window.location.href = '/complete?public_id={{my_task.public_id}}';">Выполнить</button></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-primary" onclick="window.location.href = '/add';">Добавить новую</button>
+</section>

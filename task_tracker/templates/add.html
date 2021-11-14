@@ -1,16 +1,14 @@
 <!doctype html>
-<title>Новый айтем</title>
+<title>Новый таск</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Новый айтем</h1>
+  <h1>Новый таск</h1>
 </nav>
 <section class="content">
   <header>
   </header>
     <form method="POST" action="/add">
-      <label>title: <input type="title" name="title" autocomplete="title" required></label><br/>
       <label>description: <input type="description" name="description" autocomplete="description" required></label><br/>
-      <label>status: <input type="status" name="status" autocomplete="status" required></label><br/>
-      <button type="submit">Создать</button>
+      <button type="submit" class="btn btn-primary">Создать</button>
     </form>
 </section>

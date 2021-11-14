@@ -10,8 +10,8 @@ from rabbitmq_gateway import (
     RabbitMQGateway,
 )
 
-CUD_QUEUE = "cud-item-inventory"
-BUSINESS_QUEUE = "business-item-inventory"
+CUD_QUEUE = "cud-task-tracker"
+BUSINESS_QUEUE = "business-task-tracker"
 
 
 callbacks_map = {

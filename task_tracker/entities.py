@@ -13,11 +13,11 @@ class User:
 
 
 @dataclass
-class Item:
+class Task:
 
     id: int
     public_id: str
-    title: str
     description: str
     status: str
-    user_id: Optional[int]
+    price: str
+    assign_to_public_id: Optional[str]
